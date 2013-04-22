@@ -66,38 +66,7 @@ function plot_line($title,$testa,$data_block,$xdata="" ,$ydata=""){
     function drawChart() {
         var data = new google.visualization.DataTable();
       ';
-        $dat=null;
-        $riga=0;
-        $cols=0;
-        $atd="";
-        foreach($testa as $k=>$v){
-            if($k==$xdata){
-              $js.="data.addColumn('number', '".$v."');\n";
-            }else{
-            	$js.="data.addColumn('number', '".$v."');\n";
-            }
-        	$cols++;
-        	
-        }
-        $js .="data.addRows(".count($data_block).");\n"; 
-        $riga=0;
-        foreach($data_block as $chiave=>$d){
-        	$x=0; 
-			$js.="data.addRow([";
-			
-        	foreach($d as $k=>$v){ //{v:".$riga.",f:'".$v."'}
-        		if($x!=0)
-					$js.=",";
-        		if($k==$xdata){
-        		    $js.="{v:".$riga.",f:'".$v."'}";
-        		}else{
-        			$js.=" {v:".str_replace("€ ", "", $v).",f:'".$v."'}";
-        		}
-        		$x++;
-        	} 
-			$js.=" ]);\n";
-        	$riga++;
-        }      
+        $js.=data_encode($testa,$data_block,$xdata);       
         /* //var view = google.visualization.arrayToDataTable(".$encodata."); */ 
         $js.="
         
@@ -142,10 +111,10 @@ function plot_pie($title,$testa,$data_block,$xdata="" ,$ydata=""){
             	$js.="data.addColumn('string', '".$v."');\n";
             }else{
             	$js.="data.addColumn('number', '".$v."');\n";
-            }
-        	$cols++;
-        	
+            }	
         }
+		
+		
         $js .="data.addRows(".count($data_block).");\n"; 
         $riga=0;
         foreach($data_block as $chiave=>$d){
@@ -185,6 +154,52 @@ function plot_pie($title,$testa,$data_block,$xdata="" ,$ydata=""){
 
         return $ret.$html.$js;            
 }
+function data_encode($testa,$data_block,$xdata){
+	    $dat=null;
+		$js="";
+        $riga=0;
+        $cols=0;
+        $atd="";
+		$colonna=array();
+		//$js.="data.addColumn('number', '".$xdata."');\n";
+		$js.="data.addColumn('string', '".$xdata."');\n";
+        foreach($testa as $k=>$v){
+            if($v!=$xdata){
+            	$js .="data.addColumn('number', '".$v."');\n";
+            }
+        	$cols++;
+        }
+
+        //$js .="data.addRows(".count($data_block).");\n"; 
+        $riga=0;
+        foreach($data_block as $chiave=>$d){
+        	
+			$js.="data.addRow([";
+			$x=0; 
+			$colonna=array();
+        	foreach($d as $k=>$v){ //{v:".$riga.",f:'".$v."'}
+        		if($k==$xdata){
+        		    //$colonna[$xdata]="{v:".$riga.",f:'".$v."'}";
+        		    $colonna[$xdata]="{v:'".$v."',f:'".$v."'}";
+        		}else{
+        			$colonna[$k]=" {v:".str_replace(",",".",preg_replace("/[^0-9,.]/", "", $v)).",f:'".$v."'}";
+        		}
+        		$x++;
+        	}
+			if(isset($xdata)) 
+				$js.=$colonna[$xdata];
+			foreach($colonna as $k=>$c){
+				if($k!=$xdata){
+					$js.=",";
+					$js.=$c;
+				}
+			}				
+			$js.=" ]);\n";
+        	$riga++;
+        }  
+		return $js;
+}
+
 
 
 function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
@@ -201,38 +216,7 @@ function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
     function drawChart() {
         var data = new google.visualization.DataTable();
       ';
-        $dat=null;
-        $riga=0;
-        $cols=0;
-        $atd="";
-        foreach($testa as $k=>$v){
-            if($k==$xdata){
-            	$js.="data.addColumn('number', '".$v."');\n";
-            }else{
-            	$js.="data.addColumn('number', '".$v."');\n";
-            }
-        	$cols++;
-        	
-        }
-        $js .="data.addRows(".count($data_block).");\n"; 
-        $riga=0;
-        foreach($data_block as $chiave=>$d){
-        	$x=0; 
-			$js.="data.addRow([";
-			
-        	foreach($d as $k=>$v){ //{v:".$riga.",f:'".$v."'}
-        		if($x!=0)
-					$js.=",";
-        		if($k==$xdata){
-        		    $js.="{v:".$riga.",f:'".$v."'}";
-        		}else{
-        			$js.=" {v:".str_replace(",",".",preg_replace("/[^0-9,.]/", "", $v)).",f:'".$v."'}";
-        		}
-        		$x++;
-        	} 
-			$js.=" ]);\n";
-        	$riga++;
-        }      
+		$js.=data_encode($testa,$data_block,$xdata);  
         /* //var view = google.visualization.arrayToDataTable(".$encodata."); */ 
         $js.="
         
@@ -254,6 +238,8 @@ function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
         return $ret.$html.$js;            
 }
 
+
+
 function plot_table($title,$testa,$data_block,$xdata="" ,$ydata=""){
         if(is_object($testa))
             $testa=get_object_vars($testa);
@@ -268,38 +254,7 @@ function plot_table($title,$testa,$data_block,$xdata="" ,$ydata=""){
     function drawChart() {
         var data = new google.visualization.DataTable();
       ';
-        $dat=null;
-        $riga=0;
-        $cols=0;
-        $atd="";
-        foreach($testa as $k=>$v){
-            if($k==$xdata){
-            	$js.="data.addColumn('number', '".$v."');\n";
-            }else{
-            	$js.="data.addColumn('number', '".$v."');\n";
-            }
-        	$cols++;
-        	
-        }
-        $js .="data.addRows(".count($data_block).");\n"; 
-        $riga=0;
-        foreach($data_block as $chiave=>$d){
-        	$x=0; 
-			$js.="data.addRow([";
-			
-        	foreach($d as $k=>$v){ //{v:".$riga.",f:'".$v."'}
-        		if($x!=0)
-					$js.=",";
-        		if($k==$xdata){
-        		    $js.="{v:".$riga.",f:'".$v."'}";
-        		}else{
-        			$js.=" {v:".str_replace(",",".",preg_replace("/[^0-9,.]/", "", $v)).",f:'".$v."'}";
-        		}
-        		$x++;
-        	} 
-			$js.=" ]);\n";
-        	$riga++;
-        }      
+        $js.=data_encode($testa,$data_block,$xdata);        
         /* //var view = google.visualization.arrayToDataTable(".$encodata."); */ 
         $js.="        
         var chart = new google.visualization.Table(document.getElementById('".$div_id."'));
