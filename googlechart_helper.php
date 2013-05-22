@@ -57,7 +57,7 @@ function plot_line($title,$testa,$data_block,$xdata="" ,$ydata=""){
             $testa=get_object_vars($testa);
         $ret = "";
         
-        $div_id=url_title($title);
+        $div_id=url_title($title).uniqid();
         $html="<div id='".$div_id."' class='google-chart'></div>";
         
         $js='        <script type="text/javascript">
@@ -73,6 +73,7 @@ function plot_line($title,$testa,$data_block,$xdata="" ,$ydata=""){
         var options = {
           title: '".$title."',  
           legend : 'right' ,
+          chartArea:{left:10,top:20,width:'80%',height:'80%'},
           vAxis: {minValue: 0, title: '".$ydata."',  titleTextStyle: {color: 'red'}},
           hAxis: {title: '".$xdata."', titleTextStyle: {color: 'red'}}
         };
@@ -93,7 +94,7 @@ function plot_pie($title,$testa,$data_block,$xdata="" ,$ydata=""){
             $testa=get_object_vars($testa);
         $ret = "";
         
-        $div_id=url_title($title);
+        $div_id=url_title($title).uniqid();
         $html="<div id='".$div_id."' class='google-chart'></div>";
         
         $js='        <script type="text/javascript">
@@ -186,7 +187,7 @@ function data_encode($testa,$data_block,$xdata){
         		}
         		$x++;
         	}
-			if(isset($xdata)) 
+			if(isset($xdata) and isset($colonna[$xdata])) 
 				$js.=$colonna[$xdata];
 			foreach($colonna as $k=>$c){
 				if($k!=$xdata){
@@ -200,14 +201,12 @@ function data_encode($testa,$data_block,$xdata){
 		return $js;
 }
 
-
-
-function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
+function plot_image_bar($title,$testa,$data_block,$xdata="" ,$ydata=""){
         if(is_object($testa))
             $testa=get_object_vars($testa);
         $ret = "";
         
-        $div_id=url_title($title);
+        $div_id=url_title($title).uniqid();
         $html="<div id='".$div_id."' class='google-chart'></div>";
         
         $js='        <script type="text/javascript">
@@ -217,6 +216,46 @@ function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
         var data = new google.visualization.DataTable();
       ';
 		$js.=data_encode($testa,$data_block,$xdata);  
+		
+        /* //var view = google.visualization.arrayToDataTable(".$encodata."); */ 
+        $js.="
+        
+	        var options = {
+	          title: '".$title."',  
+	          legend : 'bottom' ,
+	          'chartArea': {'width': '80%', 'height': '80%'},
+	          vAxis: {minValue: 0, title: '".$ydata."',  titleTextStyle: {color: 'red'}},
+	          hAxis: {title: '".$xdata."', titleTextStyle: {color: 'red'}},
+	          isStacked: true
+	        };
+
+        var chart = new google.visualization.BarChart(document.getElementById('".$div_id."'));
+        chart.draw(data, options);
+      }
+    </script>";
+        
+
+        
+
+        return $ret.$html.$js;            
+}
+
+function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
+        if(is_object($testa))
+            $testa=get_object_vars($testa);
+        $ret = "";
+        
+        $div_id=url_title($title).uniqid();
+        $html="<div id='".$div_id."' class='google-chart'></div>";
+        
+        $js='        <script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(drawChart);
+    function drawChart() {
+        var data = new google.visualization.DataTable();
+      ';
+		$js.=data_encode($testa,$data_block,$xdata);  
+		
         /* //var view = google.visualization.arrayToDataTable(".$encodata."); */ 
         $js.="
         
@@ -224,6 +263,7 @@ function plot_vertical($title,$testa,$data_block,$xdata="" ,$ydata=""){
           title: '".$title."',  
           legend : 'right' ,
           vAxis: {minValue: 0, title: '".$ydata."',  titleTextStyle: {color: 'red'}},
+          //
           hAxis: {title: '".$xdata."', titleTextStyle: {color: 'red'}}
         };
         
