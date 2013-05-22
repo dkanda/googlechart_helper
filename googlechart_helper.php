@@ -201,7 +201,7 @@ function data_encode($testa,$data_block,$xdata){
 		return $js;
 }
 
-function plot_image_bar($title,$testa,$data_block,$xdata="" ,$ydata=""){
+function plot_bar($title,$testa,$data_block,$xdata="" ,$ydata=""){
         if(is_object($testa))
             $testa=get_object_vars($testa);
         $ret = "";
